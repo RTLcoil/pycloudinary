@@ -9,17 +9,18 @@ from math import ceil
 
 from six import python_2_unicode_compatible, string_types
 
-from cloudinary import utils
-from cloudinary.compat import urlparse, parse_qs
-from cloudinary.search import Search
-
-from platform import python_version
 
 logger = logging.getLogger("Cloudinary")
 ch = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
+
+from cloudinary import utils
+from cloudinary.compat import urlparse, parse_qs
+from cloudinary.search import Search
+
+from platform import python_version
 
 CF_SHARED_CDN = "d3jpl91pxevbkh.cloudfront.net"
 OLD_AKAMAI_SHARED_CDN = "cloudinary-a.akamaihd.net"
