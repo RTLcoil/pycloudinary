@@ -330,7 +330,7 @@ P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC\
 
         # It should call default upload() method for remote URLs
         # copied from test_upload_url()
-        resource4 = uploader.upload_large("http://cloudinary.com/images/old_logo.png", tags=[UNIQUE_TAG])
+        resource4 = uploader.upload_large(REMOTE_TEST_IMAGE, tags=[UNIQUE_TAG])
         self.assertEqual(resource4["width"], TEST_IMAGE_WIDTH)
         self.assertEqual(resource4["height"], TEST_IMAGE_HEIGHT)
         expected_signature = utils.api_sign_request(dict(public_id=resource4["public_id"], version=resource4["version"]),

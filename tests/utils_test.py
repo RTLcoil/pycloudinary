@@ -792,13 +792,8 @@ class TestUtils(unittest.TestCase):
         self.assertIn("is not JSON serializable", str(te.exception))
 
     def test_is_remote_url(self):
-        file_path1 = TEST_IMAGE
-        result1 = cloudinary.utils.is_remote_url(file_path1)
-        self.assertFalse(result1)
-
-        file_path2 = 'http://cloudinary.com/images/old_logo.png'
-        result2 = cloudinary.utils.is_remote_url(file_path2)
-        self.assertTrue(result2)
+        self.assertFalse(cloudinary.utils.is_remote_url(TEST_IMAGE))
+        self.assertTrue(cloudinary.utils.is_remote_url(REMOTE_TEST_IMAGE))
 
 if __name__ == '__main__':
     unittest.main()
