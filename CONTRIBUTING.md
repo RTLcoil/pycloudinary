@@ -50,16 +50,6 @@ git checkout master
 git pull upstream master
 git checkout -b my-feature-branch
 ```
-#### Rebase
-
-If you've been working on a change for a while, rebase with upstream/master.
-
-```
-git fetch upstream
-git rebase upstream/master
-git push origin my-feature-branch -f
-```
-
 
 #### Write Tests
 

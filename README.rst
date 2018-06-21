@@ -132,7 +132,7 @@ The following example generates the url for accessing an uploaded
                                     height = 150,
                                     crop = "fill")
 
-Another example, emedding a smaller version of an uploaded image while
+Another example, embedding a smaller version of an uploaded image while
 generating a 90x90 face detection based thumbnail:
 
 .. code:: python
@@ -350,9 +350,9 @@ the uploaded image's metadata to the backend:
 
 .. code:: htmldjango
 
-    <form action="{% url "direct_upload_complete" %}" enctype="multipart/form-data">
+    <form action="{% url "direct_upload_complete_url" %}" enctype="multipart/form-data">
         {% csrf_token %}
-        {% cloudinary_direct_upload_field field='fieldname' request=request %}
+        {% cloudinary_direct_upload_field 'fieldname' request=request %}
     </form>
 
 In both cases, the request object is optional, but is needed for
@@ -401,7 +401,7 @@ Additional resources are available at:
 
 -  `Website <http://cloudinary.com>`__
 -  `Documentation <http://cloudinary.com/documentation>`__
--  `Knowledge Base <http://support.cloudinary.com/forums>`__
+-  `Knowledge Base <http://support.cloudinary.com/hc/en-us>`__
 -  `Documentation for Django
    integration <http://cloudinary.com/documentation/django_integration>`__
 -  `Django image upload
