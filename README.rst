@@ -329,7 +329,7 @@ object using:
 
 .. code:: htmldjango
 
-    {% cloudinary image width=100 height=100 crop="fill" %}
+    {% cloudinary "sample" format="png" width=100 height=100 crop="fill" %}
     <img src="http://res.cloudinary.com/cloud_name/image/upload/c_fill,h_100,w_100/sample.png" width="100" height="100" crop="scale"/>
 
 Uploading images
