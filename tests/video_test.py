@@ -68,12 +68,12 @@ class VideoTest(unittest.TestCase):
 
         del options['source_types']
         self.assertEqual(self.video.video(**options),
-                         "<video height=\"100\" poster=\""
-                         + expected_url + ".jpg\" width=\"200\">"
-                         + "<source src=\"" + expected_url + ".webm\" type=\"video/webm\">"
-                         + "<source src=\"" + expected_url + ".mp4\" type=\"video/mp4\">"
-                         + "<source src=\"" + expected_url + ".ogv\" type=\"video/ogg\">"
-                         + "</video>")
+                         "<video height=\"100\" poster=\"" +
+                         expected_url + ".jpg\" width=\"200\">" +
+                         "<source src=\"" + expected_url + ".webm\" type=\"video/webm\">" +
+                         "<source src=\"" + expected_url + ".mp4\" type=\"video/mp4\">" +
+                         "<source src=\"" + expected_url + ".ogv\" type=\"video/ogg\">" +
+                         "</video>")
 
         del options['html_height']
         del options['html_width']
@@ -106,10 +106,10 @@ class VideoTest(unittest.TestCase):
                          fallback +
                          "</video>")
         self.assertEqual(self.video.video(fallback_content=fallback, source_types="mp4"),
-                         "<video poster=\"" + expected_url + ".jpg\" src=\""
-                         + expected_url + ".mp4\">"
-                         + fallback
-                         + "</video>")
+                         "<video poster=\"" + expected_url + ".jpg\" src=\"" +
+                         expected_url + ".mp4\">" +
+                         fallback +
+                         "</video>")
 
     def test_video_tag_with_source_types(self):
         expected_url = VIDEO_UPLOAD_PATH + "movie"

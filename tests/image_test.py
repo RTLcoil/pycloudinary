@@ -10,9 +10,9 @@ from cloudinary import CloudinaryImage
 
 class ImageTest(unittest.TestCase):
     def setUp(self):
-        self.cloud_name = 'test123' #TODO temporary! old='test'
-        self.public_id = "sample"   #TODO temporary! old='hello'
-        self.image_format = "jpg"   #TODO temporary! old='png'
+        self.cloud_name = 'test123'
+        self.public_id = "sample"
+        self.image_format = "jpg"
         self.full_public_id = "{id}.{format}".format(id=self.public_id, format=self.image_format)
         self.upload_url = "http://res.cloudinary.com/{cloud_name}/image/upload".format(cloud_name=self.cloud_name)
         self.common_format = {"url": self.upload_url, "id": self.full_public_id}
@@ -26,12 +26,6 @@ class ImageTest(unittest.TestCase):
 
         cloudinary.reset_config()
         cloudinary.config(cloud_name=self.cloud_name, api_secret="1234", cname=None)
-
-    def sixAssertNotRegex(self, text, unexpected_regexp, msg=None):
-        if six.PY2:
-            return self.assertNotRegexpMatches(text, unexpected_regexp, msg=msg)
-        else:
-            return self.assertNotRegex(text, unexpected_regexp, msg=msg)
 
     def test_build_url(self):
         """should generate url """

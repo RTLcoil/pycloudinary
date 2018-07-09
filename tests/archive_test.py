@@ -93,7 +93,6 @@ class ArchiveTest(unittest.TestCase):
     def test_download_zip_url_options(self):
         result = utils.download_zip_url(
             tags=[TEST_TAG], transformations=[{"width": 0.5}, {"width": 2.0}], cloud_name="demo")
-        # self.assertRegexpMatches(result, '^https://api.cloudinary.com/v1_1/demo/.*$')
         upload_prefix = cloudinary.config().upload_prefix or "https://api.cloudinary.com"
         six.assertRegex(self, result, r'^{0}/v1_1/demo/.*$'.format(upload_prefix))
 
