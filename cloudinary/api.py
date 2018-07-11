@@ -14,15 +14,38 @@ from cloudinary import utils
 
 logger = cloudinary.logger
 
+
 # intentionally one-liners
-class Error(Exception): pass
-class NotFound(Error): pass
-class NotAllowed(Error): pass
-class AlreadyExists(Error): pass
-class RateLimited(Error): pass
-class BadRequest(Error): pass
-class GeneralError(Error): pass
-class AuthorizationRequired(Error): pass
+class Error(Exception):
+    pass
+
+
+class NotFound(Error):
+    pass
+
+
+class NotAllowed(Error):
+    pass
+
+
+class AlreadyExists(Error):
+    pass
+
+
+class RateLimited(Error):
+    pass
+
+
+class BadRequest(Error):
+    pass
+
+
+class GeneralError(Error):
+    pass
+
+
+class AuthorizationRequired(Error):
+    pass
 
 
 EXCEPTION_CODES = {
@@ -457,6 +480,7 @@ def __prepare_streaming_profile_params(**options):
                            for trans in options["representations"]]
         params["representations"] = json.dumps(representations)
     return params
+
 
 def __delete_resource_params(options, **params):
     p = dict(transformations=utils.build_eager(options.get('transformations')),

@@ -44,6 +44,7 @@ PREFIX = "test_folder_{}".format(SUFFIX)
 MAPPING_TEST_ID = "api_test_upload_mapping_{}".format(SUFFIX)
 RESTORE_TEST_ID = "api_test_restore_{}".format(SUFFIX)
 
+
 class ApiTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -70,7 +71,8 @@ class ApiTest(unittest.TestCase):
             except Exception:
                 pass
         presets_response = api.upload_presets(max_results=200)
-        preset_names = [ preset["name"] for preset in presets_response.get('presets',[]) if UNIQUE_TAG in preset.get('settings',{}).get('tags','')]
+        preset_names = [
+            preset["name"] for preset in presets_response.get('presets', []) if UNIQUE_TAG in preset.get('settings', {}).get('tags', '')]
         for name in preset_names:
             try:
                 api.delete_upload_preset(name)
@@ -222,7 +224,8 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(url.endswith('/resources/raw/fetch'))
         self.assertIn(public_resource_id, get_list_param(mocker, 'public_ids'))
         self.assertIn(public_resource_id2, get_list_param(mocker, 'public_ids'))
-        self.assertEqual(get_param(mocker, 'transformations'),
+        self.assertEqual(
+            get_param(mocker, 'transformations'),
             utils.build_eager([transformation, transformation2]))
         self.assertTrue(get_param(mocker, 'keep_original'))
         self.assertTrue(get_param(mocker, 'invalidate'))

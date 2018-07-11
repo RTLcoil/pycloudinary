@@ -410,8 +410,8 @@ P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC\
 
         # Should accept a dictionary of datetime objects
         acl_2 = OrderedDict((("access_type", "anonymous"),
-                          ("start", datetime.strptime("2019-02-22 16:20:57Z", "%Y-%m-%d %H:%M:%SZ")),
-                          ("end", datetime(2019, 3, 22, 0, 0, tzinfo=UTC()))))
+                            ("start", datetime.strptime("2019-02-22 16:20:57Z", "%Y-%m-%d %H:%M:%SZ")),
+                            ("end", datetime(2019, 3, 22, 0, 0, tzinfo=UTC()))))
 
         exp_acl_2 = '[{"access_type":"anonymous","start":"2019-02-22T16:20:57","end":"2019-03-22T00:00:00+00:00"}]'
 

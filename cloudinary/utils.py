@@ -146,8 +146,8 @@ def generate_transformation_string(**options):
     angle = ".".join([str(value) for value in build_array(options.pop("angle", None))])
     no_html_sizes = has_layer or angle or crop == "fit" or crop == "limit" or responsive_width
 
-    if width and (str(width).startswith("auto") or str(width) == "ow" or
-                      is_fraction(width) or no_html_sizes):
+    if width and (str(width).startswith("auto") or str(width) == "ow"
+                  or is_fraction(width) or no_html_sizes):
         del options["width"]
     if height and (str(height) == "oh" or is_fraction(height) or no_html_sizes):
         del options["height"]
@@ -628,7 +628,7 @@ def download_archive_url(**options):
     params.update(mode="download")
     cloudinary_params = sign_request(archive_params(**params), options)
     return cloudinary_api_url("generate_archive", **options) + "?" + \
-           urlencode(bracketize_seq(cloudinary_params), True)
+        urlencode(bracketize_seq(cloudinary_params), True)
 
 
 def download_zip_url(**options):
@@ -955,7 +955,7 @@ def base64_encode_url(url):
 
     try:
         url = unquote(url)
-    except:
+    except Exception:
         pass
     url = smart_escape(url)
     b64 = base64.b64encode(url.encode('utf-8'))
