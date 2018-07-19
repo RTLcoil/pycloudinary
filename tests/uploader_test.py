@@ -24,6 +24,8 @@ TEST_IMAGE_HEIGHT = 51
 TEST_IMAGE_WIDTH = 241
 UNIQUE_TAG = "up_test_uploader_{}".format(SUFFIX)
 TEST_DOCX_ID = "test_docx_{}".format(SUFFIX)
+TEST_TRANS_SCALE2 = 'c_scale,w_2.0'
+TEST_TRANS_SCALE2_PNG = 'c_scale,w_2.0/png'
 
 
 class UploaderTest(unittest.TestCase):
@@ -32,13 +34,30 @@ class UploaderTest(unittest.TestCase):
         cloudinary.reset_config()
 
     @classmethod
+    def setUpClass(cls):
+        cls.resources_to_delete = []
+        cls.transformations_to_delete = [
+            TEST_TRANS_SCALE2,
+            TEST_TRANS_SCALE2_PNG,
+        ]
+
+    @classmethod
     def tearDownClass(cls):
         cloudinary.api.delete_resources_by_tag(UNIQUE_TAG)
         cloudinary.api.delete_resources_by_tag(UNIQUE_TAG, resource_type='raw')
         cloudinary.api.delete_resources_by_tag(UNIQUE_TAG, type='twitter_name')
         cloudinary.api.delete_resources_by_tag(UNIQUE_TAG, type='text')
-        cloudinary.api.delete_resources([TEST_IMAGE])
+        cloudinary.api.delete_resources([TEST_IMAGE, REMOTE_TEST_IMAGE, REMOTE_TEST_IMAGE_UNICODE])
         cloudinary.api.delete_resources([TEST_DOCX_ID], resource_type='raw')
+        if cls.resources_to_delete:
+            cloudinary.api.delete_resources(cls.resources_to_delete)
+
+        if cls.transformations_to_delete:
+            for trans in cls.transformations_to_delete:
+                try:
+                    api.delete_transformation(trans)
+                except Exception:
+                    pass
 
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test_upload(self):
@@ -98,7 +117,7 @@ class UploaderTest(unittest.TestCase):
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test_upload_url(self):
         """should successfully upload file by url """
-        result = uploader.upload("http://cloudinary.com/images/old_logo.png", tags=[UNIQUE_TAG])
+        result = uploader.upload(REMOTE_TEST_IMAGE, tags=[UNIQUE_TAG])
         self.assertEqual(result["width"], TEST_IMAGE_WIDTH)
         self.assertEqual(result["height"], TEST_IMAGE_HEIGHT)
         expected_signature = utils.api_sign_request(dict(public_id=result["public_id"], version=result["version"]),
@@ -108,7 +127,7 @@ class UploaderTest(unittest.TestCase):
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test_upload_unicode_url(self):
         """should successfully upload file by unicode url """
-        result = uploader.upload(u"http://cloudinary.com/images/old_logo.png", tags=[UNIQUE_TAG])
+        result = uploader.upload(REMOTE_TEST_IMAGE_UNICODE, tags=[UNIQUE_TAG])
         self.assertEqual(result["width"], TEST_IMAGE_WIDTH)
         self.assertEqual(result["height"], TEST_IMAGE_HEIGHT)
         expected_signature = utils.api_sign_request(dict(public_id=result["public_id"], version=result["version"]),
@@ -176,6 +195,7 @@ P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC\
     def test_text(self):
         """should successfully generate text image """
         result = uploader.text("hello world", tags=[UNIQUE_TAG])
+        self.resources_to_delete.append(result["public_id"])
         self.assertGreater(result["width"], 1)
         self.assertGreater(result["height"], 1)
 
@@ -199,6 +219,8 @@ P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC\
         """should successfully remove all tags"""
         result = uploader.upload(TEST_IMAGE, tags=[UNIQUE_TAG])
         result2 = uploader.upload(TEST_IMAGE, tags=[UNIQUE_TAG])
+        self.resources_to_delete.append(result["public_id"])
+        self.resources_to_delete.append(result2["public_id"])
         uploader.add_tag("tag1", [result["public_id"], result2["public_id"]])
         uploader.add_tag("tag2", result["public_id"])
         self.assertEqual(api.resource(result["public_id"])["tags"], ["tag1", "tag2", UNIQUE_TAG])
