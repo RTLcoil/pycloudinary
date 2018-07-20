@@ -6,6 +6,8 @@ from datetime import timedelta, tzinfo
 
 SUFFIX = os.environ.get('TRAVIS_JOB_ID') or random.randint(10000, 99999)
 REMOTE_TEST_IMAGE = "http://cloudinary.com/images/old_logo.png"
+REMOTE_TEST_IMAGE_UNICODE = u"http://cloudinary.com/images/old_logo.png"
+RESOURCE_UPLOAD_TYPES = ['facebook', 'fetch', 'multi', 'sprite', 'text', 'twitter_name', 'upload']
 TEST_IMAGE = "tests/logo.png"
 TEST_TAG = "pycloudinary_test"
 UNIQUE_TAG = "{0}_{1}".format(TEST_TAG, SUFFIX)

@@ -16,6 +16,7 @@ UNIQUE_TAG = 'search_{}'.format(UNIQUE_TAG)
 
 TEST_IMAGES_COUNT = 3
 MAX_INDEX_RETRIES = 10
+TEST_TRANS_SCALE100 = "c_scale,w_100"
 
 public_ids = ["api_test{0}_{1}".format(i, SUFFIX) for i in range(0, TEST_IMAGES_COUNT)]
 upload_results = ["++"]
@@ -47,6 +48,10 @@ class SearchTest(unittest.TestCase):
 
             attempt += 1
 
+        cls.transformations_to_delete = [
+            TEST_TRANS_SCALE100,
+        ]
+
     def setUp(self):
         if not self.ready:
             self.fail("Failed indexing test resources")
@@ -57,6 +62,13 @@ class SearchTest(unittest.TestCase):
             api.delete_resources_by_tag(UNIQUE_TAG)
         except Exception as e:
             logger.exception("Failed to delete test resources %s", e)
+
+        if cls.transformations_to_delete:
+            for trans in cls.transformations_to_delete:
+                try:
+                    api.delete_transformation(trans)
+                except Exception:
+                    pass
 
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test_should_create_empty_json(self):
