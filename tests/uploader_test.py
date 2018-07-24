@@ -64,6 +64,15 @@ class UploaderTest(unittest.TestCase):
                 except Exception:
                     pass
 
+    @classmethod
+    def generate_public_id(cls, res_upload_type='upload'):
+        if not res_upload_type in RESOURCE_UPLOAD_TYPES:
+            res_upload_type = 'upload'
+        suffix = '{0}_{1}'.format(len(cls.resources_to_delete[res_upload_type]), SUFFIX)
+        public_id = get_unique_public_id(res_upload_type, suffix = suffix)
+        cls.resources_to_delete[res_upload_type].append(public_id)
+        return public_id
+
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test_upload(self):
         """should successfully upload file """
@@ -199,8 +208,7 @@ P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC\
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test_text(self):
         """should successfully generate text image """
-        result = uploader.text("hello world", tags=[UNIQUE_TAG])
-        self.resources_to_delete['text'].append(result["public_id"])
+        result = uploader.text("hello world", public_id=self.generate_public_id('text'), tags=[UNIQUE_TAG])
         self.assertGreater(result["width"], 1)
         self.assertGreater(result["height"], 1)
 
@@ -222,10 +230,8 @@ P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC\
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test_remove_all_tags(self):
         """should successfully remove all tags"""
-        result = uploader.upload(TEST_IMAGE, tags=[UNIQUE_TAG])
-        result2 = uploader.upload(TEST_IMAGE, tags=[UNIQUE_TAG])
-        self.resources_to_delete['upload'].append(result["public_id"])
-        self.resources_to_delete['upload'].append(result2["public_id"])
+        result = uploader.upload(TEST_IMAGE, public_id=self.generate_public_id(), tags=[UNIQUE_TAG])
+        result2 = uploader.upload(TEST_IMAGE, public_id=self.generate_public_id(), tags=[UNIQUE_TAG])
         uploader.add_tag("tag1", [result["public_id"], result2["public_id"]])
         uploader.add_tag("tag2", result["public_id"])
         self.assertEqual(api.resource(result["public_id"])["tags"], ["tag1", "tag2", UNIQUE_TAG])

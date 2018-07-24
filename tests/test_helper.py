@@ -64,3 +64,9 @@ def get_list_param(mocker, name):
     params = get_params(args)
     reg = re.compile(r'{}\[\d*\]'.format(name))
     return [params[key] for key in params.keys() if reg.match(key)]
+
+
+def get_unique_public_id(res_upload_type='upload', suffix=''):
+    if not res_upload_type in RESOURCE_UPLOAD_TYPES:
+        res_upload_type = 'upload'
+    return '{0}_{1}_{2}'.format(TEST_TAG, res_upload_type, suffix)
