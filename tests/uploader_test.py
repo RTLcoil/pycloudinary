@@ -22,10 +22,12 @@ disable_warnings()
 
 TEST_IMAGE_HEIGHT = 51
 TEST_IMAGE_WIDTH = 241
+TEST_TRANS_OVERLAY = {'font_family':'arial', 'font_size':20, 'text':'{}'.format(SUFFIX)}
+TEST_TRANS_OVERLAY_STR = 'text:arial_20:{}'.format(SUFFIX)
+TEST_TRANS_SCALE2 = "c_scale,l_{},w_2.0".format(TEST_TRANS_OVERLAY_STR)
+TEST_TRANS_SCALE2_PNG = "c_scale,l_{},w_2.0/png".format(TEST_TRANS_OVERLAY_STR)
 UNIQUE_TAG = "up_test_uploader_{}".format(SUFFIX)
 TEST_DOCX_ID = "test_docx_{}".format(SUFFIX)
-TEST_TRANS_SCALE2 = "c_scale,w_2.0"
-TEST_TRANS_SCALE2_PNG = "c_scale,w_2.0/png"
 
 
 class UploaderTest(unittest.TestCase):
@@ -50,7 +52,6 @@ class UploaderTest(unittest.TestCase):
         cloudinary.api.delete_resources_by_tag(UNIQUE_TAG, resource_type='raw')
         cloudinary.api.delete_resources_by_tag(UNIQUE_TAG, type='twitter_name')
         cloudinary.api.delete_resources_by_tag(UNIQUE_TAG, type='text')
-        cloudinary.api.delete_resources([TEST_IMAGE, REMOTE_TEST_IMAGE, REMOTE_TEST_IMAGE_UNICODE])
         cloudinary.api.delete_resources([TEST_DOCX_ID], resource_type='raw')
         if cls.resources_to_delete:
             for t in RESOURCE_UPLOAD_TYPES:
@@ -120,7 +121,7 @@ class UploaderTest(unittest.TestCase):
         mocker.return_value = MOCK_RESPONSE
         test_values = ['auto:advanced', 'auto:best', '80:420', 'none']
         for quality in test_values:
-            uploader.upload(TEST_IMAGE, tags=TEST_TAG, quality_override=quality)
+            uploader.upload(TEST_IMAGE, tags=UNIQUE_TAG, quality_override=quality)
             params = mocker.call_args[0][2]
             self.assertEqual(params['quality_override'], quality)
         # verify explicit works too
@@ -188,8 +189,8 @@ P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC\
     def test_explicit(self):
         """should support explicit """
         result = uploader.explicit("cloudinary", type="twitter_name",
-                                   eager=[dict(crop="scale", width="2.0", format="png")], tags=[UNIQUE_TAG])
-        url = utils.cloudinary_url("cloudinary", type="twitter_name", crop="scale", width="2.0", format="png",
+                                   eager=[dict(crop="scale", width="2.0", format="png", overlay=TEST_TRANS_OVERLAY)], tags=[UNIQUE_TAG])
+        url = utils.cloudinary_url("cloudinary", type="twitter_name", crop="scale", width="2.0", format="png", overlay=TEST_TRANS_OVERLAY,
                                    version=result["version"])[0]
         actual = result["eager"][0]["url"]
         self.assertEqual(parse_url(actual).path, parse_url(url).path)
@@ -197,7 +198,7 @@ P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC\
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test_eager(self):
         """should support eager """
-        uploader.upload(TEST_IMAGE, eager=[dict(crop="scale", width="2.0")], tags=[UNIQUE_TAG])
+        uploader.upload(TEST_IMAGE, eager=[dict(crop="scale", width="2.0", overlay=TEST_TRANS_OVERLAY)], tags=[UNIQUE_TAG])
 
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test_header(self):
@@ -208,7 +209,7 @@ P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC\
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test_text(self):
         """should successfully generate text image """
-        result = uploader.text("hello world", public_id=self.get_unique_public_id('text'), tags=[UNIQUE_TAG])
+        result = uploader.text("hello world", public_id=self.get_unique_public_id('text'))
         self.assertGreater(result["width"], 1)
         self.assertGreater(result["height"], 1)
 
@@ -230,12 +231,12 @@ P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC\
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test_remove_all_tags(self):
         """should successfully remove all tags"""
-        result = uploader.upload(TEST_IMAGE, public_id=self.get_unique_public_id(), tags=[UNIQUE_TAG])
-        result2 = uploader.upload(TEST_IMAGE, public_id=self.get_unique_public_id(), tags=[UNIQUE_TAG])
+        result = uploader.upload(TEST_IMAGE, public_id=self.get_unique_public_id())
+        result2 = uploader.upload(TEST_IMAGE, public_id=self.get_unique_public_id())
         uploader.add_tag("tag1", [result["public_id"], result2["public_id"]])
         uploader.add_tag("tag2", result["public_id"])
-        self.assertEqual(api.resource(result["public_id"])["tags"], ["tag1", "tag2", UNIQUE_TAG])
-        self.assertEqual(api.resource(result2["public_id"])["tags"], ["tag1", UNIQUE_TAG])
+        self.assertEqual(api.resource(result["public_id"])["tags"], ["tag1", "tag2"])
+        self.assertEqual(api.resource(result2["public_id"])["tags"], ["tag1"])
         uploader.remove_all_tags([result["public_id"], result2["public_id"]])
         self.assertFalse("tags" in api.resource(result["public_id"]))
         self.assertFalse("tags" in api.resource(result2["public_id"]))

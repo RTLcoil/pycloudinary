@@ -35,6 +35,9 @@ API_TEST_ID5 = "api_test_{}5".format(SUFFIX)
 API_TEST_TRANS = "api_test_transformation_{}".format(SUFFIX)
 API_TEST_TRANS2 = "api_test_transformation_{}2".format(SUFFIX)
 API_TEST_TRANS3 = "api_test_transformation_{}3".format(SUFFIX)
+API_TEST_TRANS_OVERLAY = {'font_family':'arial', 'font_size':20, 'text':'{}'.format(SUFFIX)}
+API_TEST_TRANS_OVERLAY_STR = 'text:arial_20:{}'.format(SUFFIX)
+API_TEST_TRANS_SCALE100 = "c_scale,l_{},w_100".format(API_TEST_TRANS_OVERLAY_STR)
 API_TEST_PRESET = "api_test_upload_preset_{}".format(SUFFIX)
 API_TEST_PRESET2 = "api_test_upload_preset_{}2".format(SUFFIX)
 API_TEST_PRESET3 = "api_test_upload_preset_{}3".format(SUFFIX)
@@ -42,7 +45,7 @@ API_TEST_PRESET4 = "api_test_upload_preset_{}4".format(SUFFIX)
 PREFIX = "test_folder_{}".format(SUFFIX)
 MAPPING_TEST_ID = "api_test_upload_mapping_{}".format(SUFFIX)
 RESTORE_TEST_ID = "api_test_restore_{}".format(SUFFIX)
-TEST_TRANS_SCALE100 = "c_scale,w_100"
+
 
 class ApiTest(unittest.TestCase):
     @classmethod
@@ -54,13 +57,13 @@ class ApiTest(unittest.TestCase):
         for id in [API_TEST_ID, API_TEST_ID2]:
             uploader.upload(TEST_IMAGE,
                             public_id=id, tags=[API_TEST_TAG, ],
-                            context="key=value", eager=[{"width": 100, "crop": "scale"}],
+                            context="key=value", eager=[{"width": 100, "crop": "scale", "overlay": API_TEST_TRANS_OVERLAY}],
                             overwrite=True)
         cls.transformations_to_delete = [
             API_TEST_TRANS,
             API_TEST_TRANS2,
             API_TEST_TRANS3,
-            TEST_TRANS_SCALE100,
+            API_TEST_TRANS_SCALE100,
         ]
 
     @classmethod
@@ -321,7 +324,7 @@ class ApiTest(unittest.TestCase):
     def test12a_transformations_cursor(self, mocker):
         """ should allow listing transformations with cursor """
         mocker.return_value = MOCK_RESPONSE
-        api.transformation(TEST_TRANS_SCALE100, next_cursor='2412515', max_results=10)
+        api.transformation(API_TEST_TRANS_SCALE100, next_cursor='2412515', max_results=10)
         params = mocker.call_args[0][2]
         self.assertEqual(params['next_cursor'], '2412515')
         self.assertEqual(params['max_results'], 10)
@@ -329,22 +332,22 @@ class ApiTest(unittest.TestCase):
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test13_transformation_metadata(self):
         """ should allow getting transformation metadata """
-        transformation = api.transformation(TEST_TRANS_SCALE100)
+        transformation = api.transformation(API_TEST_TRANS_SCALE100)
         self.assertNotEqual(transformation, None)
-        self.assertEqual(transformation["info"], [{"crop": "scale", "width": 100}])
-        transformation = api.transformation({"crop": "scale", "width": 100})
+        self.assertEqual(transformation["info"], [{"crop": "scale", "width": 100, "overlay": API_TEST_TRANS_OVERLAY_STR}])
+        transformation = api.transformation({"crop": "scale", "width": 100, "overlay": API_TEST_TRANS_OVERLAY})
         self.assertNotEqual(transformation, None)
-        self.assertEqual(transformation["info"], [{"crop": "scale", "width": 100}])
+        self.assertEqual(transformation["info"], [{"crop": "scale", "width": 100, "overlay": API_TEST_TRANS_OVERLAY_STR}])
 
     @patch('urllib3.request.RequestMethods.request')
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test14_transformation_update(self, mocker):
         """ should allow updating transformation allowed_for_strict """
         mocker.return_value = MOCK_RESPONSE
-        api.update_transformation(TEST_TRANS_SCALE100, allowed_for_strict=True)
+        api.update_transformation(API_TEST_TRANS_SCALE100, allowed_for_strict=True)
         args, kargs = mocker.call_args
         self.assertEqual(args[0], 'PUT')
-        self.assertTrue(get_uri(args).endswith('/transformations/'+TEST_TRANS_SCALE100))
+        self.assertTrue(get_uri(args).endswith('/transformations/'+API_TEST_TRANS_SCALE100))
         self.assertTrue(get_params(args)['allowed_for_strict'])
 
     @patch('urllib3.request.RequestMethods.request')
@@ -381,10 +384,10 @@ class ApiTest(unittest.TestCase):
     def test17_transformation_implicit(self, mocker):
         """ should allow deleting implicit transformation """
         mocker.return_value = MOCK_RESPONSE
-        api.delete_transformation(TEST_TRANS_SCALE100)
+        api.delete_transformation(API_TEST_TRANS_SCALE100)
         args, kargs = mocker.call_args
         self.assertEqual(args[0], 'DELETE')
-        self.assertTrue(get_uri(args).endswith('/transformations/'+TEST_TRANS_SCALE100))
+        self.assertTrue(get_uri(args).endswith('/transformations/'+API_TEST_TRANS_SCALE100))
 
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test18_usage(self):
