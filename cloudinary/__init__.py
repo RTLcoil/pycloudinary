@@ -229,6 +229,31 @@ class CloudinaryResource(object):
     def default_source_types():
         return ['webm', 'mp4', 'ogv']
 
+    @staticmethod
+    def default_video_sources():
+        """
+        Recommended sources for video tag
+        :return: List of Dict of default video sources
+        """
+
+        return [
+            {
+                "type": "mp4",
+                "codecs": "hevc",
+                "transformations": {"video_codec": "h265"}
+            }, {
+                "type": "webm",
+                "codecs": "vp9",
+                "transformations": {"video_codec": "vp9"}
+            }, {
+                "type": "mp4",
+                "transformations": {"video_codec": "auto"}
+            }, {
+                "type": "webm",
+                "transformations": {"video_codec": "auto"}
+            },
+        ]
+
     def __get_srcset_breakpoints(self, srcset_data):
         """
         Helper function. Gets or populates srcset breakpoints using provided parameters.
@@ -407,10 +432,40 @@ class CloudinaryResource(object):
         self.default_poster_options(options)
         return self.build_url(**options)
 
+    @staticmethod
+    def video_mime_type(video_type, codecs=None):
+        """
+        Helper function for video(), generates video mime type string from video_type and codecs
+
+        :param video_type: one of the HTML5 video tag MIME types: video/mp4, video/webm, video/ogg.
+        It should be "mp4", "webm" etc.
+
+        :param codecs: List or string of codecs. "avc1.42E01E" or "avc1.42E01E,mp4a.40.2" or ["avc1.42E01E", "mp4a.40.2"]
+
+        :return: Resulting mime type
+        """
+
+        res = ''
+        video_type = 'ogg' if video_type == 'ogv' else video_type
+        if video_type:
+            if isinstance(codecs, list):
+                codecs = codecs
+            elif isinstance(codecs, str):
+                codecs = [x.strip() for x in codecs.split(',')]
+            else:
+                codecs = []
+
+            codecs_str = '; codecs={}'.format(', '.join(codecs)) if codecs else ''
+            res = 'video/{}{}'.format(video_type, codecs_str)
+
+        return res
+
     # Creates an HTML video tag for the provided +source+
     #
     # ==== Options
     # * <tt>source_types</tt> - Specify which source type the tag should include. defaults to webm, mp4 and ogv.
+    # * <tt>sources</tt> - source_types and sources are mutually exclusive, only one of them can be used.
+    #                       If both are not provided, source types are used (for backwards compatibility).
     # * <tt>source_transformation</tt> - specific transformations to use for a specific source type.
     # * <tt>poster</tt> - override default thumbnail:
     #   * url: provide an ad hoc url
@@ -426,13 +481,14 @@ class CloudinaryResource(object):
         source = re.sub("\.({0})$".format("|".join(self.default_source_types())), '', public_id)
 
         source_types = options.pop('source_types', [])
+        source_types_extended = options.pop('sources', [])
         source_transformation = options.pop('source_transformation', {})
         fallback = options.pop('fallback_content', '')
         options['resource_type'] = options.pop('resource_type', self.resource_type or 'video')
 
-        if not source_types: source_types = self.default_source_types()
         video_options = options.copy()
 
+        # generate video poster attributes
         if 'poster' in video_options:
             poster_options = video_options['poster']
             if isinstance(poster_options, dict):
@@ -445,29 +501,47 @@ class CloudinaryResource(object):
 
         if not video_options['poster']: del video_options['poster']
 
-        nested_source_types = isinstance(source_types, list) and len(source_types) > 1
-        if not nested_source_types:
-            source = source + '.' + utils.build_array(source_types)[0]
+        # populate video source tags
+        source_tags = []
+        if source_types_extended and isinstance(source_types_extended, list):
+            # processing new source structure with codecs
+            for source_data in source_types_extended:
+                transformation = options.copy()
+                transformation.update(source_data.get("transformations", {}))
+                source_type = source_data.get("type", '')
+                src = utils.cloudinary_url(source, format=source_type, **transformation)[0]
+                codecs = source_data.get("codecs", [])
+                source_tags.append("<source {attributes}>".format(
+                    attributes=utils.html_attrs({'src': src, 'type': self.video_mime_type(source_type, codecs)})))
+        else:
+            # processing old source_types structure with out codecs
+            if not source_types:
+                source_types = self.default_source_types()
+
+            nested_source_types = isinstance(source_types, list) and len(source_types) > 1
+            if nested_source_types:
+                for source_type in source_types:
+                    transformation = options.copy()
+                    transformation.update(source_transformation.get(source_type, {}))
+                    src = utils.cloudinary_url(source, format=source_type, **transformation)[0]
+                    source_tags.append("<source {attributes}>".format(
+                        attributes=utils.html_attrs({'src': src, 'type': self.video_mime_type(source_type)})))
+
+            if not source_tags:
+                source = source + '.' + utils.build_array(source_types)[0]
 
         video_url = utils.cloudinary_url(source, **video_options)
         video_options = video_url[1]
-        if not nested_source_types:
+        if not source_tags:
             video_options['src'] = video_url[0]
+
+        # collect video tag attributes
         if 'html_width' in video_options: video_options['width'] = video_options.pop('html_width')
         if 'html_height' in video_options: video_options['height'] = video_options.pop('html_height')
 
-        sources = ""
-        if nested_source_types:
-            for source_type in source_types:
-                transformation = options.copy()
-                transformation.update(source_transformation.get(source_type, {}))
-                src = utils.cloudinary_url(source, format=source_type, **transformation)[0]
-                video_type = "ogg" if source_type == 'ogv' else source_type
-                mime_type = "video/" + video_type
-                sources += "<source {attributes}>".format(attributes=utils.html_attrs({'src': src, 'type': mime_type}))
-
+        sources_str = ''.join(str(x) for x in source_tags)
         html = "<video {attributes}>{sources}{fallback}</video>".format(
-            attributes=utils.html_attrs(video_options), sources=sources, fallback=fallback)
+            attributes=utils.html_attrs(video_options), sources=sources_str, fallback=fallback)
         return html
 
 

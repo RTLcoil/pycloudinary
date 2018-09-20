@@ -60,7 +60,22 @@ class VideoTest(unittest.TestCase):
             '<video height="100" poster="{expected_url}.jpg" src="{expected_url}.mp4" width="200"></video>'
                 .format(expected_url=expected_url))
 
+        # test for new sources (replace source_types with sources to work with codecs list)
+        options['sources'] = self.video.default_video_sources()
+        expected_url = VIDEO_UPLOAD_PATH + "ac_acc,so_3,{}movie.{}"
+        self.assertEqual(
+            self.video.video(poster=expected_url.format('vc_h264/', 'jpg'), **options),
+            "<video height=\"100\" poster=\"" + expected_url.format('vc_h264/', 'jpg') + "\" width=\"200\">" +
+            "<source src=\"" + expected_url.format('vc_h265/', 'mp4') + "\" type=\"video/mp4; codecs=hevc\">" +
+            "<source src=\"" + expected_url.format('vc_vp9/', 'webm') + "\" type=\"video/webm; codecs=vp9\">" +
+            "<source src=\"" + expected_url.format('vc_auto/', 'mp4') + "\" type=\"video/mp4\">" +
+            "<source src=\"" + expected_url.format('vc_auto/', 'webm') + "\" type=\"video/webm\">" +
+            "</video>"
+        )
+        del options['sources']
+
         del options['source_types']
+        expected_url = VIDEO_UPLOAD_PATH + "ac_acc,so_3,vc_h264/movie"
         self.assertEqual(self.video.video(**options),
                          "<video height=\"100\" poster=\"" + expected_url + ".jpg\" width=\"200\">" +
                          "<source src=\"" + expected_url + ".webm\" type=\"video/webm\">" +
@@ -152,6 +167,67 @@ class VideoTest(unittest.TestCase):
 
         self.assertEqual(self.video.video(poster=False, source_types="mp4"),
                          "<video src=\"" + expected_url + ".mp4\"></video>")
+
+    def test_video_tag_default_sources(self):
+        expected_url = VIDEO_UPLOAD_PATH + "{}movie.{}"
+
+        self.assertEqual(
+            self.video.video(poster=expected_url.format('', 'jpg'), sources=self.video.default_video_sources()),
+            "<video poster=\"" + expected_url.format('', 'jpg') + "\">" +
+            "<source src=\"" + expected_url.format('vc_h265/', 'mp4') + "\" type=\"video/mp4; codecs=hevc\">" +
+            "<source src=\"" + expected_url.format('vc_vp9/', 'webm') + "\" type=\"video/webm; codecs=vp9\">" +
+            "<source src=\"" + expected_url.format('vc_auto/', 'mp4') + "\" type=\"video/mp4\">" +
+            "<source src=\"" + expected_url.format('vc_auto/', 'webm') + "\" type=\"video/webm\">" +
+            "</video>"
+        )
+
+    def test_video_tag_custom_sources(self):
+        custom_sources = [
+            {
+                "type": "mp4",
+                "codecs": "vp8, vorbis",
+                "transformations": {"video_codec": "auto"}
+            },{
+                "type": "webm",
+                "codecs": "avc1.4D401E, mp4a.40.2",
+                "transformations": {"video_codec": "auto"}
+            },
+        ]
+        expected_url = VIDEO_UPLOAD_PATH + "{}movie.{}"
+
+        self.assertEqual(
+            self.video.video(poster=expected_url.format('', 'jpg'), sources=custom_sources),
+            "<video poster=\"" + expected_url.format('', 'jpg') + "\">" +
+            "<source src=\"" + expected_url.format('vc_auto/', 'mp4') +
+            "\" type=\"video/mp4; codecs=vp8, vorbis\">" +
+            "<source src=\"" + expected_url.format('vc_auto/', 'webm') +
+            "\" type=\"video/webm; codecs=avc1.4D401E, mp4a.40.2\">" +
+            "</video>"
+        )
+
+    def test_video_tag_sources_codecs_array(self):
+        custom_sources = [
+            {
+                "type": "mp4",
+                "codecs": ["vp8", "vorbis"],
+                "transformations": {"video_codec": "auto"}
+            },{
+                "type": "webm",
+                "codecs": ["avc1.4D401E", "mp4a.40.2"],
+                "transformations": {"video_codec": "auto"}
+            }
+        ]
+        expected_url = VIDEO_UPLOAD_PATH + "{}movie.{}"
+
+        self.assertEqual(
+            self.video.video(poster=expected_url.format('', 'jpg'), sources=custom_sources),
+            "<video poster=\"" + expected_url.format('', 'jpg') + "\">" +
+            "<source src=\"" + expected_url.format('vc_auto/', 'mp4') +
+            "\" type=\"video/mp4; codecs=vp8, vorbis\">" +
+            "<source src=\"" + expected_url.format('vc_auto/', 'webm') +
+            "\" type=\"video/webm; codecs=avc1.4D401E, mp4a.40.2\">" +
+            "</video>"
+        )
 
 
 if __name__ == '__main__':
