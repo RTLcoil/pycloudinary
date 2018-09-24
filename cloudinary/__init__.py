@@ -435,12 +435,12 @@ class CloudinaryResource(object):
     @staticmethod
     def video_mime_type(video_type, codecs=None):
         """
-        Helper function for video(), generates video mime type string from video_type and codecs
+        Helper function for video(), generates video MIME type string from video_type and codecs.
+        Example: video/mp4; codecs=mp4a.40.2
 
-        :param video_type: one of the HTML5 video tag MIME types: video/mp4, video/webm, video/ogg.
-        It should be "mp4", "webm" etc.
+        :param video_type: mp4, webm, ogg etc.
 
-        :param codecs: List or string of codecs. "avc1.42E01E" or "avc1.42E01E,mp4a.40.2" or ["avc1.42E01E", "mp4a.40.2"]
+        :param codecs: List or string of codecs. "avc1.42E01E" or "avc1.42E01E, mp4a.40.2" or ["avc1.42E01E", "mp4a.40.2"]
 
         :return: Resulting mime type
         """
@@ -464,8 +464,9 @@ class CloudinaryResource(object):
     #
     # ==== Options
     # * <tt>source_types</tt> - Specify which source type the tag should include. defaults to webm, mp4 and ogv.
-    # * <tt>sources</tt> - source_types and sources are mutually exclusive, only one of them can be used.
-    #                       If both are not provided, source types are used (for backwards compatibility).
+    # * <tt>sources</tt> - Similar to source_types, but may contain codecs list.
+    #                       source_types and sources are mutually exclusive, only one of them can be used.
+    #                       If both are not provided, default source types are used.
     # * <tt>source_transformation</tt> - specific transformations to use for a specific source type.
     # * <tt>poster</tt> - override default thumbnail:
     #   * url: provide an ad hoc url
