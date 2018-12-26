@@ -132,6 +132,36 @@ class TestUtils(unittest.TestCase):
         self.__test_cloudinary_url(options={"gravity": "auto", "width": 0.5, "crop": "crop"},
                                    expected_url=DEFAULT_UPLOAD_PATH + "c_crop,g_auto,w_0.5/test")
 
+    def test_radius(self):
+        p = DEFAULT_UPLOAD_PATH
+        self.__test_cloudinary_url(options={"radius": 10},
+                                   expected_url=p + "r_10/test")
+        self.__test_cloudinary_url(options={"radius": "10"},
+                                   expected_url=p + "r_10/test")
+        self.__test_cloudinary_url(options={"radius": "$v", "variables": [("$v", 10)]},
+                                   expected_url=p + "$v_10,r_$v/test")
+
+        self.__test_cloudinary_url(options={"radius": [10, 20]},
+                                   expected_url=p + "r_10:20/test")
+        self.__test_cloudinary_url(options={"radius": "10:20"},
+                                   expected_url=p + "r_10:20/test")
+        self.__test_cloudinary_url(options={"radius": "10:$v", "variables": [("$v", 20)]},
+                                   expected_url=p + "$v_20,r_10:$v/test")
+
+        self.__test_cloudinary_url(options={"radius": [10, 20, 30]},
+                                   expected_url=p + "r_10:20:30/test")
+        self.__test_cloudinary_url(options={"radius": "10:20:30"},
+                                   expected_url=p + "r_10:20:30/test")
+        self.__test_cloudinary_url(options={"radius": "10:$v:30", "variables": [("$v", 20)]},
+                                   expected_url=p + "$v_20,r_10:$v:30/test")
+
+        self.__test_cloudinary_url(options={"radius": [10, 20, 30, 40]},
+                                   expected_url=p + "r_10:20:30:40/test")
+        self.__test_cloudinary_url(options={"radius": "10:20:30:40"},
+                                   expected_url=p + "r_10:20:30:40/test")
+        self.__test_cloudinary_url(options={"radius": "10:$v:30:40", "variables": [("$v", 20)]},
+                                   expected_url=p + "$v_20,r_10:$v:30:40/test")
+
     def test_should_support_auto_width(self):
         """should support auto width"""
         self.__test_cloudinary_url(options={"width": "auto:20", "crop": 'fill'},
