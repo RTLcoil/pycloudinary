@@ -412,13 +412,19 @@ def process_video_codec_param(param):
 def process_radius(param):
     if param is None:
         return
-    elif isinstance(param, (list, tuple)) and 1 <= len(param) <= 4:
+
+    if isinstance(param, (list, tuple)) and 1 <= len(param) <= 4:
         return ':'.join(str(t) for t in param)
-    elif isinstance(param, six.string_types):
+
+    if isinstance(param, six.string_types) and param:
         return process_radius(param.split(':'))
-    elif isinstance(param, int):
+
+    if isinstance(param, int) and not isinstance(param, bool):
         return str(param)
-    raise ValueError('invalid radius param')
+
+    raise ValueError("Invalid radius param: it can be a list with 1-4 int- or string-items; "
+                     "string that contains ':'-separated numbers or int. "
+                     "A user-defined variable can be set instead of an int-value.")
 
 
 def cleanup_params(params):

@@ -133,34 +133,35 @@ class TestUtils(unittest.TestCase):
                                    expected_url=DEFAULT_UPLOAD_PATH + "c_crop,g_auto,w_0.5/test")
 
     def test_radius(self):
-        p = DEFAULT_UPLOAD_PATH
-        self.__test_cloudinary_url(options={"radius": 10},
-                                   expected_url=p + "r_10/test")
-        self.__test_cloudinary_url(options={"radius": "10"},
-                                   expected_url=p + "r_10/test")
-        self.__test_cloudinary_url(options={"radius": "$v", "variables": [("$v", 10)]},
-                                   expected_url=p + "$v_10,r_$v/test")
+        cases = (
+            ({"radius": 10}, "r_10/test"),
+            ({"radius": "10"}, "r_10/test"),
+            ({"radius": "$v", "variables": [("$v", 10)]}, "$v_10,r_$v/test"),
+            ({"radius": [10, 20]}, "r_10:20/test"),
+            ({"radius": "10:20"}, "r_10:20/test"),
+            ({"radius": "10:$v", "variables": [("$v", 20)]}, "$v_20,r_10:$v/test"),
+            ({"radius": [10, 20, 30]}, "r_10:20:30/test"),
+            ({"radius": "10:20:30"}, "r_10:20:30/test"),
+            ({"radius": "10:$v:30", "variables": [("$v", 20)]}, "$v_20,r_10:$v:30/test"),
+            ({"radius": [10, 20, 30, 40]}, "r_10:20:30:40/test"),
+            ({"radius": "10:20:30:40"}, "r_10:20:30:40/test"),
+            ({"radius": "10:$v:30:40", "variables": [("$v", 20)]}, "$v_20,r_10:$v:30:40/test"),
+        )
+        for options, expected_part_url in cases:
+            self.__test_cloudinary_url(options=options, expected_url=DEFAULT_UPLOAD_PATH + expected_part_url)
 
-        self.__test_cloudinary_url(options={"radius": [10, 20]},
-                                   expected_url=p + "r_10:20/test")
-        self.__test_cloudinary_url(options={"radius": "10:20"},
-                                   expected_url=p + "r_10:20/test")
-        self.__test_cloudinary_url(options={"radius": "10:$v", "variables": [("$v", 20)]},
-                                   expected_url=p + "$v_20,r_10:$v/test")
-
-        self.__test_cloudinary_url(options={"radius": [10, 20, 30]},
-                                   expected_url=p + "r_10:20:30/test")
-        self.__test_cloudinary_url(options={"radius": "10:20:30"},
-                                   expected_url=p + "r_10:20:30/test")
-        self.__test_cloudinary_url(options={"radius": "10:$v:30", "variables": [("$v", 20)]},
-                                   expected_url=p + "$v_20,r_10:$v:30/test")
-
-        self.__test_cloudinary_url(options={"radius": [10, 20, 30, 40]},
-                                   expected_url=p + "r_10:20:30:40/test")
-        self.__test_cloudinary_url(options={"radius": "10:20:30:40"},
-                                   expected_url=p + "r_10:20:30:40/test")
-        self.__test_cloudinary_url(options={"radius": "10:$v:30:40", "variables": [("$v", 20)]},
-                                   expected_url=p + "$v_20,r_10:$v:30:40/test")
+        wrong_options = (
+            {"radius": True},
+            {"radius": {1}},
+            {"radius": []},
+            {"radius": ()},
+            {"radius": ""},
+            {"radius": [10, 20, 30, 40, 50]},
+            {"radius": "10:20:30:40:50"},
+        )
+        for options in wrong_options:
+            with self.assertRaises(ValueError):
+                cloudinary.utils.cloudinary_url("test", **options)
 
     def test_should_support_auto_width(self):
         """should support auto width"""
