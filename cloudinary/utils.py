@@ -413,18 +413,14 @@ def process_radius(param):
     if param is None:
         return
 
-    if isinstance(param, (list, tuple)) and 1 <= len(param) <= 4:
+    if isinstance(param, (list, tuple)):
+        if not 1 <= len(param) <= 4:
+            raise ValueError("Invalid radius param: it can be a list with 1-4 int- or string-items; "
+                             "string that contains ':'-separated numbers or int. "
+                             "A user-defined variable can be set instead of an int-value.")
         return ':'.join(str(t) for t in param)
 
-    if isinstance(param, six.string_types) and param:
-        return process_radius(param.split(':'))
-
-    if isinstance(param, int) and not isinstance(param, bool):
-        return str(param)
-
-    raise ValueError("Invalid radius param: it can be a list with 1-4 int- or string-items; "
-                     "string that contains ':'-separated numbers or int. "
-                     "A user-defined variable can be set instead of an int-value.")
+    return str(param)
 
 
 def cleanup_params(params):
