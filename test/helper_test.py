@@ -13,7 +13,7 @@ import six
 from urllib3 import HTTPResponse
 from urllib3._collections import HTTPHeaderDict
 
-from cloudinary import utils, logger
+from cloudinary import utils, logger, api
 
 SUFFIX = os.environ.get('TRAVIS_JOB_ID') or random.randint(10000, 99999)
 
@@ -153,10 +153,20 @@ def retry_assertion(num_tries=3, delay=3):
 
 
 @contextmanager
-def ignore_exception(o=None, error_classes=(Exception,)):
-    if o is None:
-        o = sys.stderr
+def ignore_exception(error_classes=(Exception,)):
     try:
         yield
     except error_classes:
-        traceback.print_exc(file=o)
+        traceback.print_exc(file=sys.stderr)
+
+
+def cleanup_test_resources_by_tag(params):
+    for args, kwargs in params:
+        with ignore_exception():
+            api.delete_resources_by_tag(*args, **kwargs)
+
+
+def cleanup_test_transformation(params):
+    for args, kwargs in params:
+        with ignore_exception():
+            api.delete_transformation(*args, **kwargs)
