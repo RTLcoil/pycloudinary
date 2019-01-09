@@ -166,6 +166,12 @@ def cleanup_test_resources_by_tag(params):
             api.delete_resources_by_tag(*args, **kwargs)
 
 
+def cleanup_test_resources(params):
+    for args, kwargs in params:
+        with ignore_exception():
+            api.delete_resources(*args, **kwargs)
+
+
 def cleanup_test_transformation(params):
     for args, kwargs in params:
         with ignore_exception():

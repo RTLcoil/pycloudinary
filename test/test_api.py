@@ -9,7 +9,8 @@ from urllib3 import disable_warnings
 import cloudinary
 from cloudinary import api, uploader, utils
 from test.helper_test import SUFFIX, TEST_IMAGE, get_uri, get_params, get_list_param, get_param, TEST_DOC, get_method, \
-    UNIQUE_TAG, api_response_mock, ignore_exception, cleanup_test_resources_by_tag, cleanup_test_transformation
+    UNIQUE_TAG, api_response_mock, ignore_exception, cleanup_test_resources_by_tag, cleanup_test_transformation, \
+    cleanup_test_resources
 
 MOCK_RESPONSE = api_response_mock()
 
@@ -51,8 +52,7 @@ class ApiTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        with ignore_exception():
-            api.delete_resources([API_TEST_ID, API_TEST_ID2, API_TEST_ID3, API_TEST_ID4, API_TEST_ID5])
+        cleanup_test_resources([([API_TEST_ID, API_TEST_ID2, API_TEST_ID3, API_TEST_ID4, API_TEST_ID5], {})])
 
         cleanup_test_transformation([
             ([API_TEST_TRANS], {}),
