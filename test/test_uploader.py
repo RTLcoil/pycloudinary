@@ -88,9 +88,9 @@ class UploaderTest(unittest.TestCase):
         ])
 
         cleanup_test_resources([
-            ([TEST_ID1, TEST_ID2], {}),
-            ([TEXT_ID], {'type': 'text'}),
-            ([TEST_DOCX_ID], {'resource_type': 'raw'}),
+            ([[TEST_ID1, TEST_ID2]], {}),
+            ([[TEXT_ID]], {'type': 'text'}),
+            ([[TEST_DOCX_ID]], {'resource_type': 'raw'}),
         ])
 
         cleanup_test_transformation([
