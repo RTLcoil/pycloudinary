@@ -52,18 +52,15 @@ class ApiTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cleanup_test_resources([([[API_TEST_ID, API_TEST_ID2, API_TEST_ID3, API_TEST_ID4, API_TEST_ID5]], {})])
+        cleanup_test_resources([([API_TEST_ID, API_TEST_ID2, API_TEST_ID3, API_TEST_ID4, API_TEST_ID5], {})])
 
         cleanup_test_transformation([
-            ([API_TEST_TRANS], {}),
-            ([API_TEST_TRANS2], {}),
-            ([API_TEST_TRANS3], {}),
-            ([API_TEST_TRANS_SCALE100_STR], {}),
+            ([API_TEST_TRANS, API_TEST_TRANS2, API_TEST_TRANS3, API_TEST_TRANS_SCALE100_STR], {}),
         ])
 
         cleanup_test_resources_by_tag([
-            ([UNIQUE_API_TAG], {}),
-            ([UNIQUE_API_TAG], {'resource_type': 'raw'}),
+            (UNIQUE_API_TAG, {}),
+            (UNIQUE_API_TAG, {'resource_type': 'raw'}),
         ])
 
         with ignore_exception():

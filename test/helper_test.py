@@ -161,18 +161,19 @@ def ignore_exception(error_classes=(Exception,)):
 
 
 def cleanup_test_resources_by_tag(params):
-    for args, kwargs in params:
+    for tag, options in params:
         with ignore_exception():
-            api.delete_resources_by_tag(*args, **kwargs)
+            api.delete_resources_by_tag(tag, **options)
 
 
 def cleanup_test_resources(params):
-    for args, kwargs in params:
+    for public_ids, options in params:
         with ignore_exception():
-            api.delete_resources(*args, **kwargs)
+            api.delete_resources(public_ids, **options)
 
 
 def cleanup_test_transformation(params):
-    for args, kwargs in params:
-        with ignore_exception():
-            api.delete_transformation(*args, **kwargs)
+    for transformations, options in params:
+        for transformation in transformations:
+            with ignore_exception():
+                api.delete_transformation(transformation, **options)

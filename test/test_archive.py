@@ -34,8 +34,8 @@ class ArchiveTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cleanup_test_resources_by_tag([
-            ([TEST_TAG], {}),
-            ([TEST_TAG_RAW], {'resource_type': 'raw'}),
+            (TEST_TAG, {}),
+            (TEST_TAG_RAW, {'resource_type': 'raw'}),
         ])
 
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
