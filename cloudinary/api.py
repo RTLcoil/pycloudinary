@@ -444,9 +444,10 @@ def _call_api(method, uri, params=None, body=None, headers=None, **options):
 
     try:
         result = json.loads(body.decode('utf-8'))
-    except Exception as e:
+    except Exception:
         # Error is parsing json
-        raise GeneralError("Error parsing server response (%d) - %s. Got - %s" % (response.status, body, e))
+        msg = 'No JSON object could be decoded'
+        raise GeneralError("Error parsing server response (%d) - %s. Got - %s" % (response.status, body, msg))
 
     if "error" in result:
         exception_class = EXCEPTION_CODES.get(response.status) or Exception

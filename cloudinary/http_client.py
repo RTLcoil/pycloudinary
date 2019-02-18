@@ -36,8 +36,9 @@ class HttpClient:
                                                                                          response.data))
         try:
             result = json.loads(body.decode('utf-8'))
-        except Exception as e:
+        except Exception:
             # Error is parsing json
-            raise GeneralError("Error parsing server response (%d) - %s. Got - %s" % (response.status, body, e))
+            msg = 'No JSON object could be decoded'
+            raise GeneralError("Error parsing server response (%d) - %s. Got - %s" % (response.status, body, msg))
 
         return result
