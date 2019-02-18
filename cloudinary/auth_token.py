@@ -3,12 +3,12 @@ import hmac
 import re
 import time
 from binascii import a2b_hex
-
-from cloudinary.compat import quote_plus
+from utils import smart_escape
 
 
 AUTH_TOKEN_NAME = "__cld_token__"
 AUTH_TOKEN_SEPARATOR = "~"
+AUTH_TOKEN_SAFE_RE = r'([ "#%&\'\/:;<=>?@\[\\\]^`{\|}~]+)'
 
 
 def generate(url=None, acl=None, start_time=None, duration=None,
@@ -43,6 +43,6 @@ def _digest(message, key):
 
 
 def _escape_to_lower(url):
-    escaped_url = quote_plus(url, safe='*,.')
+    escaped_url = smart_escape(url, unsafe=AUTH_TOKEN_SAFE_RE)
     escaped_url = re.sub(r"%[0-9A-F]{2}", lambda x: x.group(0).lower(), escaped_url)
     return escaped_url
