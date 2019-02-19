@@ -3,7 +3,6 @@ import hmac
 import re
 import time
 from binascii import a2b_hex
-from cloudinary.utils import smart_escape
 
 
 AUTH_TOKEN_NAME = "__cld_token__"
@@ -43,6 +42,7 @@ def _digest(message, key):
 
 
 def _escape_to_lower(url):
+    from cloudinary.utils import smart_escape
     escaped_url = smart_escape(url, unsafe=AUTH_TOKEN_UNSAFE_RE)
     escaped_url = re.sub(r"%[0-9A-F]{2}", lambda x: x.group(0).lower(), escaped_url)
     return escaped_url
