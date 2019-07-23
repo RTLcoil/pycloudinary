@@ -56,17 +56,6 @@ class VideoTest(unittest.TestCase):
             'start_offset': 3
         }
 
-        op = {
-            "if": "duration > 50",
-            'source_types': "mp4",
-            'html_height': "100",
-            'html_width': "200",
-            'video_codec': {'codec': 'h264'},
-            'audio_codec': 'acc',
-            'start_offset': 3
-        }
-        print(self.video.video(**op))
-
         expected_url = VIDEO_UPLOAD_PATH + "ac_acc,so_3,vc_h264/movie"
         self.assertEqual(
             self.video.video(**options),
