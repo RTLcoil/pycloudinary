@@ -128,9 +128,6 @@ class VideoTest(unittest.TestCase):
         expected_url = VIDEO_UPLOAD_PATH + "q_50/w_100/movie"
         expected_ogv_url = VIDEO_UPLOAD_PATH + "q_50/q_70,w_100/movie"
         expected_mp4_url = VIDEO_UPLOAD_PATH + "q_50/q_30,w_100/movie"
-        print self.video.video(width=100, transformation=[{"if": "initial_duration > 50"}, {'quality': 50, 'audio_codec': 'acc'},
-                                                          {"if": "end"}],
-                                          source_transformation={'ogv': {'quality': 70}, 'mp4': {'quality': 30}})
 
         self.assertEqual(self.video.video(width=100, transformation={'quality': 50},
                                           source_transformation={'ogv': {'quality': 70}, 'mp4': {'quality': 30}}),
@@ -157,18 +154,18 @@ class VideoTest(unittest.TestCase):
         idu_transformation = [{"if": "initial_duration > 300"}, {'quality': 50, 'audio_codec': 'acc'}, {"if": "end"}]
 
         self.assertEqual(self.video.video(transformation=du_transformation),
-                         "<video poster=\"" + du_expected_url + ".jpg\">" +
-                         "<source src=\"" + du_expected_url + ".webm\" type=\"video/webm\">" +
-                         "<source src=\"" + du_expected_url + ".mp4\" type=\"video/mp4\">" +
-                         "<source src=\"" + du_expected_url + ".ogv\" type=\"video/ogg\">" +
-                         "</video>")
+                         '<video poster="' + du_expected_url + '.jpg">' +
+                         '<source src="' + du_expected_url + '.webm" type="video/webm">' +
+                         '<source src="' + du_expected_url + '.mp4" type="video/mp4">' +
+                         '<source src="' + du_expected_url + '.ogv" type="video/ogg">' +
+                         '</video>')
 
         self.assertEqual(self.video.video(transformation=idu_transformation),
-                         "<video poster=\"" + idu_expected_url + ".jpg\">" +
-                         "<source src=\"" + idu_expected_url + ".webm\" type=\"video/webm\">" +
-                         "<source src=\"" + idu_expected_url + ".mp4\" type=\"video/mp4\">" +
-                         "<source src=\"" + idu_expected_url + ".ogv\" type=\"video/ogg\">" +
-                         "</video>")
+                         '<video poster="' + idu_expected_url + '.jpg">' +
+                         '<source src="' + idu_expected_url + '.webm" type="video/webm">' +
+                         '<source src="' + idu_expected_url + '.mp4" type="video/mp4">' +
+                         '<source src="' + idu_expected_url + '.ogv" type="video/ogg">' +
+                         '</video>')
 
     def test_video_tag_with_poster(self):
         expected_url = VIDEO_UPLOAD_PATH + "movie"
