@@ -5,7 +5,7 @@ import socket
 
 import certifi
 from six import string_types
-from urllib3 import PoolManager
+from urllib3 import PoolManager, ProxyManager
 from urllib3.exceptions import HTTPError
 
 import cloudinary
@@ -29,10 +29,15 @@ if is_appengine_sandbox():
     _http = AppEngineManager()
 else:
     # PoolManager uses a socket-level API behind the scenes
-    _http = PoolManager(
-        cert_reqs='CERT_REQUIRED',
-        ca_certs=certifi.where()
-    )
+    cert_kwargs = {
+        'cert_reqs': 'CERT_REQUIRED',
+        'ca_certs': certifi.where(),
+    }
+    if cloudinary.config().proxy_host and cloudinary.config().proxy_port:
+        _http = ProxyManager('http://{}:{}'.format(cloudinary.config().proxy_host, cloudinary.config().proxy_port),
+                             **cert_kwargs)
+    else:
+        _http = PoolManager(**cert_kwargs)
 
 UPLOAD_LARGE_CHUNK_SIZE = 20000000
 
@@ -105,7 +110,7 @@ def upload_large_part(file, **options):
 
     if 'resource_type' not in options:
         options['resource_type'] = "raw"
-    
+
     return call_cacheable_api("upload", params, file=file, **options)
 
 
@@ -385,7 +390,7 @@ def call_api(action, params, http_headers=None, return_error=False, unsigned=Fal
             if response.status not in [200, 400, 401, 403, 404, 500]:
                 code = response.status
             if return_error:
-                    result["error"]["http_code"] = code
+                result["error"]["http_code"] = code
             else:
                 raise Error(result["error"]["message"])
 

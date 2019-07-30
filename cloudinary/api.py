@@ -7,6 +7,7 @@ import socket
 import urllib3
 from six import string_types
 from urllib3.exceptions import HTTPError
+from os import environ
 
 import certifi
 import cloudinary
@@ -67,10 +68,15 @@ class Response(dict):
         self.rate_limit_remaining = int(response.headers["x-featureratelimit-remaining"])
 
 
-_http = urllib3.PoolManager(
-        cert_reqs='CERT_REQUIRED',
-        ca_certs=certifi.where()
-        )
+cert_kwargs = {
+    'cert_reqs': 'CERT_REQUIRED',
+    'ca_certs': certifi.where(),
+}
+if environ.get("PROXY_HOST", None) and environ.get("PROXY_PORT", None):
+    _http = urllib3.ProxyManager('http://{}:{}'.format(environ.get("PROXY_HOST"), environ.get("PROXY_PORT")),
+                                 **cert_kwargs)
+else:
+    _http = urllib3.PoolManager(**cert_kwargs)
 
 
 def ping(**options):

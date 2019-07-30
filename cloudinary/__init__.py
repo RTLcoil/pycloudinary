@@ -99,11 +99,16 @@ class Config(object):
                 api_key=os.environ.get("CLOUDINARY_API_KEY"),
                 api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
                 secure_distribution=os.environ.get("CLOUDINARY_SECURE_DISTRIBUTION"),
-                private_cdn=os.environ.get("CLOUDINARY_PRIVATE_CDN") == 'true'
+                private_cdn=os.environ.get("CLOUDINARY_PRIVATE_CDN") == 'true',
             )
         elif os.environ.get("CLOUDINARY_URL"):
             cloudinary_url = os.environ.get("CLOUDINARY_URL")
             self._parse_cloudinary_url(cloudinary_url)
+
+        self.update(
+            proxy_host=os.environ.get("PROXY_HOST", None),
+            proxy_port=os.environ.get("PROXY_PORT", None),
+        )
 
     def _parse_cloudinary_url(self, cloudinary_url):
         uri = urlparse(cloudinary_url.replace("cloudinary://", "http://"))
