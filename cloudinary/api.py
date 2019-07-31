@@ -7,7 +7,6 @@ import socket
 import urllib3
 from six import string_types
 from urllib3.exceptions import HTTPError
-from os import environ
 
 import certifi
 import cloudinary
