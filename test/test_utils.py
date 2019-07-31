@@ -832,19 +832,6 @@ class TestUtils(unittest.TestCase):
         self.__test_cloudinary_url(public_id="video_id", options={'resource_type': 'video', 'duration': '35%'},
                                    expected_url=VIDEO_UPLOAD_PATH + "du_35p/video_id")
 
-    def test_initial_duration(self):
-        # should support decimal seconds
-        self.__test_cloudinary_url(public_id="video_id", options={'resource_type': 'video', 'initial_duration': 2.63},
-                                   expected_url=VIDEO_UPLOAD_PATH + "idu_2.63/video_id")
-        self.__test_cloudinary_url(public_id="video_id", options={'resource_type': 'video', 'initial_duration': '2.63'},
-                                   expected_url=VIDEO_UPLOAD_PATH + "idu_2.63/video_id")
-        # should support percents of the video length as "<number>p"
-        self.__test_cloudinary_url(public_id="video_id", options={'resource_type': 'video', 'initial_duration': '35p'},
-                                   expected_url=VIDEO_UPLOAD_PATH + "idu_35p/video_id")
-        # should support percents of the video length as "<number>%"
-        self.__test_cloudinary_url(public_id="video_id", options={'resource_type': 'video', 'initial_duration': '35%'},
-                                   expected_url=VIDEO_UPLOAD_PATH + "idu_35p/video_id")
-
     def test_offset(self):
         test_cases = {
             'eo_3.21,so_2.66': '2.66..3.21',
@@ -1186,6 +1173,16 @@ class TestUtils(unittest.TestCase):
 
         for message, value, expected in test_data:
             self.assertEqual(expected, build_eager(value), message)
+
+    def test_duration_condition(self):
+        du_options = {"if": "duration > 50", "width": "200"}
+        idu_options = {"if": "initial_duration > 300", "width": "200"}
+
+        transformation, options = cloudinary.utils.generate_transformation_string(**du_options)
+        self.assertEqual('if_du_gt_50,w_200', transformation)
+
+        transformation, options = cloudinary.utils.generate_transformation_string(**idu_options)
+        self.assertEqual('if_idu_gt_300,w_200', transformation)
 
 
 if __name__ == '__main__':
