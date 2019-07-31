@@ -12,6 +12,7 @@ import certifi
 import cloudinary
 from cloudinary import utils
 from cloudinary.exceptions import (
+    Error,
     BadRequest,
     AuthorizationRequired,
     NotAllowed,
