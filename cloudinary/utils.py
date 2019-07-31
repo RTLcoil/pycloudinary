@@ -14,6 +14,7 @@ import zlib
 from collections import OrderedDict
 from datetime import datetime, date
 from fractions import Fraction
+from urllib3 import ProxyManager, PoolManager
 
 import six.moves.urllib.parse
 from numbers import Number
@@ -1215,6 +1216,7 @@ def file_io_size(file_io):
 
     return size
 
+
 def check_property_enabled(f):
     """
     Used as a class method decorator to check whether class is enabled(self.enabled is True)
@@ -1229,3 +1231,18 @@ def check_property_enabled(f):
         return f(*args, **kwargs)
     
     return wrapper
+
+
+def get_http_connector(conf, options):
+    """
+    Used to create http connector, depends of environment variables of proxy
+
+    :param conf: configuration object with variables
+    :param options: additional options
+
+    :return: ProxyManager if proxy variables are set, otherwise PoolManager object
+    """
+    if conf.proxy_host and conf.proxy_port:
+        return ProxyManager('http://{}:{}'.format(conf.proxy_host, conf.proxy_port), **options)
+    else:
+        return PoolManager(**options)

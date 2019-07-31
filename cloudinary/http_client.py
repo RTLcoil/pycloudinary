@@ -5,7 +5,7 @@ import certifi
 from urllib3 import PoolManager
 from urllib3.exceptions import HTTPError
 
-from cloudinary.api import GeneralError
+from cloudinary.errors import GeneralError
 
 
 class HttpClient:

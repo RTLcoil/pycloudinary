@@ -12,40 +12,17 @@ from os import environ
 import certifi
 import cloudinary
 from cloudinary import utils
+from cloudinary.errors import (
+    BadRequest,
+    AuthorizationRequired,
+    NotAllowed,
+    NotFound,
+    AlreadyExists,
+    RateLimited,
+    GeneralError
+)
 
 logger = cloudinary.logger
-
-
-class Error(Exception):
-    pass
-
-
-class NotFound(Error):
-    pass
-
-
-class NotAllowed(Error):
-    pass
-
-
-class AlreadyExists(Error):
-    pass
-
-
-class RateLimited(Error):
-    pass
-
-
-class BadRequest(Error):
-    pass
-
-
-class GeneralError(Error):
-    pass
-
-
-class AuthorizationRequired(Error):
-    pass
 
 
 EXCEPTION_CODES = {
@@ -72,11 +49,8 @@ cert_kwargs = {
     'cert_reqs': 'CERT_REQUIRED',
     'ca_certs': certifi.where(),
 }
-if environ.get("PROXY_HOST", None) and environ.get("PROXY_PORT", None):
-    _http = urllib3.ProxyManager('http://{}:{}'.format(environ.get("PROXY_HOST"), environ.get("PROXY_PORT")),
-                                 **cert_kwargs)
-else:
-    _http = urllib3.PoolManager(**cert_kwargs)
+conf = cloudinary.config()
+_http = utils.get_http_connector(conf, cert_kwargs)
 
 
 def ping(**options):

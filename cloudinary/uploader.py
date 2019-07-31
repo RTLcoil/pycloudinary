@@ -10,7 +10,7 @@ from urllib3.exceptions import HTTPError
 
 import cloudinary
 from cloudinary import utils
-from cloudinary.api import Error
+from cloudinary.errors import Error
 from cloudinary.cache.responsive_breakpoints_cache import instance as responsive_breakpoints_cache_instance
 
 try:
@@ -33,11 +33,8 @@ else:
         'cert_reqs': 'CERT_REQUIRED',
         'ca_certs': certifi.where(),
     }
-    if cloudinary.config().proxy_host and cloudinary.config().proxy_port:
-        _http = ProxyManager('http://{}:{}'.format(cloudinary.config().proxy_host, cloudinary.config().proxy_port),
-                             **cert_kwargs)
-    else:
-        _http = PoolManager(**cert_kwargs)
+    conf = cloudinary.config()
+    _http = utils.get_http_connector(conf, cert_kwargs)
 
 UPLOAD_LARGE_CHUNK_SIZE = 20000000
 

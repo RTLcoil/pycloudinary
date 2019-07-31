@@ -6,7 +6,7 @@ import re
 import logging
 import numbers
 from math import ceil
-from six import python_2_unicode_compatible, string_types
+from six import python_2_unicode_compatible
 
 logger = logging.getLogger("Cloudinary")
 ch = logging.StreamHandler()
@@ -15,11 +15,10 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 from cloudinary import utils
-from cloudinary.api import GeneralError
+from cloudinary.errors import GeneralError
 from cloudinary.cache import responsive_breakpoints_cache
 from cloudinary.http_client import HttpClient
 from cloudinary.compat import urlparse, parse_qs
-from cloudinary.search import Search
 
 from platform import python_version
 
