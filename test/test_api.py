@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 import six
 from mock import patch
-from urllib3 import disable_warnings
+from urllib3 import disable_warnings, ProxyManager
 
 import cloudinary
 from cloudinary import api, uploader, utils
@@ -67,6 +67,12 @@ class ApiTest(unittest.TestCase):
 
         with ignore_exception(suppress_traceback_classes=(api.NotFound,)):
             api.delete_upload_mapping(MAPPING_TEST_ID)
+
+    @unittest.skipUnless(cloudinary.config().proxy_host and cloudinary.config().proxy_port,
+                         "requires proxy_host/proxy_port")
+    def test_proxy_connector(self):
+        """ should create proper proxy connector in case specific variables set  """
+        self.assertTrue(isinstance(api._http, ProxyManager))
 
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test01_resource_types(self):
