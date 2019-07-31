@@ -76,13 +76,13 @@ class ApiTest(unittest.TestCase):
 
         conf = cloudinary.config(proxy_host=None, proxy_port=None)
         http = utils.get_http_connector(conf, cert_kwargs)
-        self.assertTrue(isinstance(http, PoolManager))
+        self.assertIsInstance(http, PoolManager)
 
         conf = cloudinary.config(proxy_host='www.google.com', proxy_port=3128)
         http = utils.get_http_connector(conf, cert_kwargs)
         cloudinary.reset_config()
 
-        self.assertTrue(isinstance(http, ProxyManager))
+        self.assertIsInstance(http, ProxyManager)
 
     @unittest.skipUnless(cloudinary.config().api_secret, "requires api_key/api_secret")
     def test01_resource_types(self):

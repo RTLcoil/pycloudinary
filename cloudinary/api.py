@@ -11,7 +11,7 @@ from urllib3.exceptions import HTTPError
 import certifi
 import cloudinary
 from cloudinary import utils
-from cloudinary.errors import (
+from cloudinary.exceptions import (
     BadRequest,
     AuthorizationRequired,
     NotAllowed,
@@ -48,8 +48,7 @@ cert_kwargs = {
     'cert_reqs': 'CERT_REQUIRED',
     'ca_certs': certifi.where(),
 }
-conf = cloudinary.config()
-_http = utils.get_http_connector(conf, cert_kwargs)
+_http = utils.get_http_connector(cloudinary.config(), cert_kwargs)
 
 
 def ping(**options):

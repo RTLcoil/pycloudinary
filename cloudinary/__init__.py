@@ -15,7 +15,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 from cloudinary import utils
-from cloudinary.errors import GeneralError
+from cloudinary.exceptions import GeneralError
 from cloudinary.cache import responsive_breakpoints_cache
 from cloudinary.http_client import HttpClient
 from cloudinary.compat import urlparse, parse_qs
