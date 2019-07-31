@@ -18,6 +18,9 @@ class CloudinaryInput(forms.TextInput):
     input_type = 'file'
 
     def render(self, name, value, attrs=None, renderer=None):
+        if attrs:
+            attrs.update(self.attrs)
+
         attrs = self.build_attrs(attrs)
         options = attrs.get('options', {})
         attrs["options"] = ''
